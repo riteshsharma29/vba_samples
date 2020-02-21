@@ -16,3 +16,40 @@ Wend
 MsgBox ("done")
 
 End Sub
+
+'##############################################################################################
+
+Sub saveAsXlsx()
+
+Set filesys = CreateObject("Scripting.FileSystemObject")
+
+Dim mySheetList() As String
+ReDim mySheetList(0 To (ThisWorkbook.Sheets.Count) - 1)
+Dim a As Integer
+a = 0
+For Each ws In ActiveWorkbook.Worksheets
+    mySheetList(a) = ws.Name
+    a = a + 1
+Next ws
+
+'actually save
+Worksheets(mySheetList).Copy
+ActiveWorkbook.SaveAs Filename:=ThisWorkbook.Path & "\" & "test.xlsx"
+ActiveWorkbook.Close savechanges:=True
+ActiveWorkbook.Close savechanges:=False
+
+End Sub
+
+'################################################################################################
+
+xl = win32com.client.DispatchEx("Excel.Application")
+wb = xl.Workbooks.Open(os.path.abspath("Book1.xlsm"))
+xl.run("Book1.xlsm!InsertRows")
+xl.run("Book1.xlsm!Macro1")
+try:
+    xl.run("Book1.xlsm!saveAsXlsx")
+except Exception as err:
+    pass
+xl.Visible = True
+wb.Close(1)
+xl.Quit()
