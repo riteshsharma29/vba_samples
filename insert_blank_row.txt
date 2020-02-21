@@ -1,0 +1,18 @@
+Sub Insert_blank_Rows()
+
+'https://www.excelforum.com/excel-formulas-and-functions/484028-how-do-i-insert-a-blank-row-when-a-value-changes-automatically.html
+
+StartRow = 2 'Change the 2 to the row actual data start
+DataColumn = 2 'Change the 1 to the column where your data is
+
+I = StartRow + 1
+While Cells(I, DataColumn) <> ""
+If Cells(I, DataColumn) <> Cells(I - 1, DataColumn) Then
+Cells(I, DataColumn).EntireRow.Insert
+I = I + 1
+End If
+I = I + 1
+Wend
+MsgBox ("done")
+
+End Sub
