@@ -1,0 +1,1261 @@
+Sub create_structure(fpath)
+    Dim filesys
+    Set filesys = CreateObject("Scripting.FileSystemObject")
+    If filesys.FolderExists(fpath) Then
+       MsgBox " Folder  " & fpath & "  Already Exists", vbOKOnly
+       exvalue = 1
+       Exit Sub
+    Else
+       exvalue = 0
+       filesys.CreateFolder fpath
+    End If
+End Sub
+Function leadingzero(menuitmno) As String
+     
+    If menuitmno < 10 Then
+        menuitmno = "0" & menuitmno
+    Else
+        menuitmno = menuitmno
+    End If
+   
+    leadingzero = menuitmno
+    
+End Function
+Function Checkfile(fpath) As Boolean
+    
+    Set fs = CreateObject("Scripting.FileSystemObject")
+    If fs.Fileexists(fpath) Then
+       Checkfile = True
+    Else
+       Checkfile = False
+    End If
+    
+End Function
+Sub Genfile(fpath)
+    Set fs = CreateObject("Scripting.FileSystemObject")
+    Set a = fs.CreateTextFile(fpath, True)
+    a.Close
+End Sub
+Sub LastRowInOneColumn()
+'Find the last used row in a Column: column A in this example
+    Dim LastRow As Long
+    
+    With ActiveSheet
+        LastRow = .Cells(.Rows.Count, "g").End(xlUp).Row
+        
+        ThisWorkbook.Sheets("Config").Cells(4, 7).Value = LastRow
+    End With
+    
+    MsgBox LastRow
+End Sub
+Sub Generatefile(ftext, fpath)
+    Set fs = CreateObject("Scripting.FileSystemObject")
+    Set a = fs.CreateTextFile(fpath, True)
+    a.WriteLine (ftext)
+    a.Close
+End Sub
+Sub appendtofile(ftext, fpath)
+Dim filesys, txtfile, postername
+Set filesys = CreateObject("Scripting.FileSystemObject")
+If filesys.Fileexists(fpath) Then
+        Dim fileNum
+        fileNum = FreeFile ' next file number
+        Open fpath For Append As #fileNum ' creates the file if it doesn't exist
+        Print #fileNum, ftext ' write information at the end of the text file"
+        Close #fileNum ' close the file
+Else
+
+        Call Generatefile(ftext, fpath)
+End If
+End Sub
+Function RemoveCR(ftext) As String
+Dim ftext1, ftext2, CrPos, TxtLen
+
+   TextLen = Len(ftext)
+   
+   If TextLen > 2 Then
+       If InStr(TextLen - 2, ftext, Chr(13)) > 0 Then
+          ftext = Mid(ftext, 1, TextLen - 2)
+       End If
+   
+       Do While True
+          If (InStr(ftext, Chr(9)) > 0) Or (InStr(ftext, Chr(10)) > 0) Or (InStr(ftext, Chr(11)) > 0) Or _
+             (InStr(ftext, Chr(12)) > 0) Or (InStr(ftext, Chr(13)) > 0) Or (InStr(ftext, Chr(14)) > 0) Then
+         
+             TextLen = Len(ftext)
+         
+             If (InStr(ftext, Chr(9)) > 0) Then
+                 CrPos = InStr(ftext, Chr(9))
+             ElseIf (InStr(ftext, Chr(10)) > 0) Then
+                 CrPos = InStr(ftext, Chr(10))
+             ElseIf (InStr(ftext, Chr(11)) > 0) Then
+                 CrPos = InStr(ftext, Chr(11))
+             ElseIf (InStr(ftext, Chr(12)) > 0) Then
+                 CrPos = InStr(ftext, Chr(12))
+             ElseIf (InStr(ftext, Chr(13)) > 0) Then
+                 CrPos = InStr(ftext, Chr(13))
+             ElseIf (InStr(ftext, Chr(14)) > 0) Then
+                 CrPos = InStr(ftext, Chr(14))
+             End If
+         
+             ftext1 = Mid(ftext, 1, CrPos - 1)
+             ftext2 = Mid(ftext, CrPos + 1, TextLen - CrPos)
+             ftext = ftext1 & ftext2
+        
+          Else
+             Exit Do
+          End If
+       Loop
+   Else
+       ftext = ""
+   End If
+   
+   RemoveCR = ftext
+    
+End Function
+Function ReplaceCR(ftext) As String
+Dim ftext1, ftext2, CrPos, TxtLen
+
+   TextLen = Len(ftext)
+   
+   If TextLen > 2 Then
+       If InStr(TextLen - 2, ftext, Chr(13)) > 0 Then
+          ftext = Mid(ftext, 1, TextLen - 2)
+       End If
+   
+       Do While True
+          If (InStr(ftext, Chr(9)) > 0) Or (InStr(ftext, Chr(10)) > 0) Or (InStr(ftext, Chr(11)) > 0) Or _
+             (InStr(ftext, Chr(12)) > 0) Or (InStr(ftext, Chr(13)) > 0) Or (InStr(ftext, Chr(14)) > 0) Then
+         
+             TextLen = Len(ftext)
+         
+             If (InStr(ftext, Chr(9)) > 0) Then
+                 CrPos = InStr(ftext, Chr(9))
+             ElseIf (InStr(ftext, Chr(10)) > 0) Then
+                 CrPos = InStr(ftext, Chr(10))
+             ElseIf (InStr(ftext, Chr(11)) > 0) Then
+                 CrPos = InStr(ftext, Chr(11))
+             ElseIf (InStr(ftext, Chr(12)) > 0) Then
+                 CrPos = InStr(ftext, Chr(12))
+             ElseIf (InStr(ftext, Chr(13)) > 0) Then
+                 CrPos = InStr(ftext, Chr(13))
+             ElseIf (InStr(ftext, Chr(14)) > 0) Then
+                 CrPos = InStr(ftext, Chr(14))
+             End If
+         
+             ftext1 = Mid(ftext, 1, CrPos - 1)
+             ftext2 = Mid(ftext, CrPos + 1, TextLen - CrPos)
+             ftext = ftext1 & "<br>" & ftext2
+        
+          Else
+             Exit Do
+          End If
+       Loop
+   ElseIf (InStr(ftext, Chr(13)) > 0) Then
+       ftext = ""
+   End If
+   
+   ReplaceCR = ftext
+    
+End Function
+Function PrefixSQ(ftext) As String
+
+Dim ftext1, ftext2, CrPos, TxtLen
+
+   TextLen = Len(ftext)
+   StartPos = 1
+   Do While True
+      If (InStr(StartPos, ftext, "'") > 0) Then
+         
+         TextLen = Len(ftext)
+         CrPos = InStr(StartPos, ftext, "'")
+         
+         ftext1 = Mid(ftext, 1, CrPos - 1)
+         ftext2 = Mid(ftext, CrPos, TextLen - (CrPos - 1))
+                
+         ftext = ftext1 & "\" & ftext2
+         StartPos = CrPos + 2
+      Else
+         Exit Do
+      End If
+   Loop
+      
+   PrefixSQ = ftext
+    
+End Function
+Sub create_dir(fpath)
+    Dim filesys, drive_used
+    Set filesys = CreateObject("Scripting.FileSystemObject")
+    
+    drive_used = Mid(fpath, 1, 2)
+    
+    If filesys.FolderExists(drive_used) Then
+       
+       If filesys.FolderExists(fpath) Then
+           MsgBox " Folder  " & fpath & "  Already Exists", vbOKOnly
+           exvalue = 1
+           Exit Sub
+       Else
+           cPos = 4
+           Do While True
+              cPos1 = InStr(cPos, fpath, "\")
+          
+              If cPos1 > 0 Then
+                 cpos2 = InStr(cPos1 + 1, fpath, "\")
+              Else
+                 cpos2 = 0
+              End If
+              '*
+              If cpos2 > 0 Then
+                 ffpath = Mid(fpath, 1, cPos1 - 1)
+          
+                 If filesys.FolderExists(ffpath) Then
+                    exvalue = 1
+                    cPos = cPos1 + 1
+                 Else
+                    exvalue = 0
+                    filesys.CreateFolder ffpath
+                    cPos = cPos1 + 1
+                 End If
+              Else
+                 If (cPos > 4 And cPos1 > 0) Or (cPos = 4 And cPos1 > 0) Then
+                    ffpath = Mid(fpath, 1, cPos1 - 1)
+                    
+                    If filesys.FolderExists(ffpath) Then
+                       exvalue = 1
+                       cPos = cPos1 + 1
+                    Else
+                       exvalue = 0
+                       filesys.CreateFolder ffpath
+                       cPos = cPos1 + 1
+                    End If
+                 Else
+                    If cPos > 4 Then
+                       ffpath = Mid(fpath, 1, Len(fpath))
+                       
+                       If filesys.FolderExists(ffpath) Then
+                          exvalue = 1
+                       Else
+                          exvalue = 0
+                          filesys.CreateFolder ffpath
+                       End If
+   
+                       Exit Do
+                    Else
+                       ffpath = fpath
+                          
+                       If filesys.FolderExists(ffpath) Then
+                          exvalue = 1
+                       Else
+                          exvalue = 0
+                          filesys.CreateFolder ffpath
+                       End If
+                       
+                       Exit Do
+                    End If
+                 End If
+              End If
+           Loop
+        End If
+      Else
+         MsgBox " Invalid Drive Path : " & drive_used, vbOKOnly
+         exvalue = 1
+         Exit Sub
+      End If
+End Sub
+Sub writeunicode(ftext, fpath)
+
+Dim filesys, txtfile
+Set filesys = CreateObject("Scripting.FileSystemObject")
+If filesys.Fileexists(fpath) Then
+   Dim fileNum
+   fileNum = FreeFile() ' next file number
+
+   Open fpath For Append As fileNum
+   
+   Print #fileNum, StrConv(ftext & vbCrLf, vbUnicode); ' write information at the end of the text file"
+   Close #fileNum ' close the file
+Else
+   Call Genfile(fpath)
+   
+   fileNum = FreeFile() ' next file number
+
+   Open fpath For Append As fileNum
+   
+   Print #fileNum, Chr$(255) & Chr$(254);
+   Print #fileNum, StrConv(ftext & vbCrLf, vbUnicode); ' write information at the end of the text file"
+   Close #fileNum ' close the file
+End If
+End Sub
+Sub writetoUTF8(ftext, fpath)
+
+Dim filesys, txtfile, postername
+Set filesys = CreateObject("ADODB.Stream")
+Set fs = CreateObject("Scripting.FileSystemObject")
+
+filesys.Mode = adModeReadWrite
+filesys.Charset = "UTF-8"
+filesys.Open
+filesys.WriteText ftext
+filesys.SaveToFile fpath, 2
+Set filesys = Nothing
+
+End Sub
+Public Function ExtNum(ByVal strValue As String) As Integer
+    Dim strNum As String
+    Dim i As Integer
+
+    On Error Resume Next
+
+    For i = 1 To Len(strValue)
+        If IsNumeric(Mid(strValue, i, 1)) Then strNum = strNum & Mid(strValue, i, 1)
+    Next i
+
+    ExtNum = CInt(strNum)
+End Function
+Function BrowseForFolder(Optional OpenAt As Variant) As Variant
+     'Function purpose:  To Browser for a user selected folder.
+     'If the "OpenAt" path is provided, open the browser at that directory
+     'NOTE:  If invalid, it will open at the Desktop level
+     
+    Dim ShellApp As Object
+     
+     'Create a file browser window at the default folder
+    Set ShellApp = CreateObject("Shell.Application"). _
+    BrowseForFolder(0, "Please choose a folder containing the Images", 0, OpenAt)
+     
+     'Set the folder to that selected.  (On error in case cancelled)
+    On Error Resume Next
+    BrowseForFolder = ShellApp.self.Path
+    MsgBox (BrowseForFolder)
+    On Error GoTo 0
+     
+     'Destroy the Shell Application
+    Set ShellApp = Nothing
+     
+     'Check for invalid or non-entries and send to the Invalid error
+     'handler if found
+     'Valid selections can begin L: (where L is a letter) or
+     '\\ (as in \\servername\sharename.  All others are invalid
+    Select Case Mid(BrowseForFolder, 2, 1)
+    Case Is = ":"
+        If Left(BrowseForFolder, 1) = ":" Then GoTo Invalid
+    Case Is = "\"
+        If Not Left(BrowseForFolder, 1) = "\" Then GoTo Invalid
+    Case Else
+        GoTo Invalid
+    End Select
+     
+    Exit Function
+     
+Invalid:
+     'If it was determined that the selection was invalid, set to False
+    BrowseForFolder = False
+     
+End Function
+
+Public Sub br2_films()
+Dim FileToOpen
+Dim StartRow, EndRow
+Dim Poster_SPath, Logfile_Path, SDS_Path, Text_OPath, Data_OPath, Config_OPath
+Dim filesys
+
+Set filesys = CreateObject("Scripting.FileSystemObject")
+
+SDS_Path = ThisWorkbook.Path & "\" & "SDS" & "\"
+Logfile_Path = ThisWorkbook.Path & "\" & "Log_files" & "\"
+Text_OPath = ThisWorkbook.Path & "\" & "app_dir" & "\" & "month" & "\" & "text" & "\"
+'Data_OPath = ThisWorkbook.Path & "\" & "app_dir" & "\" & "month" & "\" & "data" & "\"
+'Config_OPath = ThisWorkbook.Path & "\" & "app_dir" & "\" & "avod.cfg" & "\"
+
+Call create_dir(SDS_Path)
+Call create_dir(Logfile_Path)
+Call create_dir(Text_OPath)
+'Call create_dir(Data_OPath)
+'Call create_dir(Config_OPath)
+
+
+Call appendtofile(vbCrLf & "######Sky Hollywood#####", Logfile_Path & "poster_log.txt")
+Call appendtofile(vbCrLf & "######Sky Hollywood#####", Logfile_Path & "sequence_log.txt")
+Call Generatefile(vbCrLf & "######Sky Hollywood#####", Logfile_Path & "data_log.txt")
+Call appendtofile(vbCrLf & "#####Sky Hollywood#######" & vbCrLf & "Please Ignore if the Log is genereated due to extra space or character10 after the relevant data or Its as per your requirement guidelines ", Logfile_Path & "Language_log.txt")
+'Call Generatefile("", Logfile_Path & "spell_log.txt")
+Call appendtofile(vbCrLf & "######Sky Hollywood#####", Logfile_Path & "autoellipses_log.txt")
+Call appendtofile(vbCrLf & "######Sky Hollywood#####", Logfile_Path & "notfitting_log.txt")
+Call appendtofile(vbCrLf & "######Sky Hollywood#####", Logfile_Path & "category_log.txt")
+Call appendtofile(vbCrLf & "######Sky Hollywood#####" & vbCrLf & "Please check the junk character by copying the data in sample files provided in the Surf32 Interactive", Logfile_Path & "Junk_log.txt")
+'Call Generatefile("", Logfile_Path & "specificisseus_log.txt")
+Call appendtofile(vbCrLf & "######Sky Hollywood#####" & vbCrLf & "PLEASE IGNORE THE LOG GENERATED AFTER THE TABLE", Logfile_Path & "BlankRows_log.txt")
+Call appendtofile(vbCrLf & "#####Sky Hollywood###########" & vbCrLf & "Contains Line Break Issues for Movies Data", Logfile_Path & "Linebreak_log.txt")
+
+
+
+Movies_Eng_title = ThisWorkbook.Sheets("Config").Cells(12, 2).Value
+Movies_Chi_title = ThisWorkbook.Sheets("Config").Cells(13, 2).Value
+Movies_Jap_title = ThisWorkbook.Sheets("Config").Cells(14, 2).Value
+Junk_tt = ThisWorkbook.Sheets("Config").Cells(4, 5).Value
+
+response = MsgBox("Please Select Movies SDS file to be Verified...", vbOKCancel)
+If response = 1 Then
+  GoTo OpenMovieSDS
+Else
+  Exit Sub
+End If
+
+OpenMovieSDS:
+FileToOpen = Application.GetOpenFilename("Excel Files (*.xls), *.xls")
+
+If FileToOpen = False Then
+response = MsgBox("Please Select Movies SDS file to be Verified...", vbOKCancel)
+  If response = 1 Then
+    GoTo OpenMovieSDS
+  Else
+    Exit Sub
+  End If
+End If
+
+If InStr(1, FileToOpen, "BR") > 0 And InStr(1, FileToOpen, "VOD") > 0 Then
+Else
+  response = MsgBox("Wrong SDS is Selected. Please Select Movies SDS...", vbOKCancel)
+  If response = 1 Then
+  GoTo OpenMovieSDS
+  Else
+  FileToOpen = False
+  Exit Sub
+  End If
+End If
+
+OpenMoviesPoster:
+  Poster_Path = BrowseForFolder
+  If Poster_Path = False Then
+    response = MsgBox("Poster Source Path is not Selected. Please Select the Poster Source Path...", vbOKCancel)
+    If response = 1 Then
+      GoTo OpenMoviesPoster
+    Else
+'      ActiveWorkbook.Save
+'      ActiveWorkbook.Close
+'      Exit Sub
+    End If
+  End If
+  Poster_SPath = Poster_Path & "\"
+
+
+FileCopy FileToOpen, SDS_Path & "EVA_3000i_Films.xls"
+MsgBox " Films SDS File is copied on the Location " & SDS_Path & "EVA_3000i_Films.xls", vbOKOnly
+
+If FileToOpen <> False Then
+  Workbooks.Open SDS_Path & "EVA_3000i_Films.xls"
+    
+      
+  sheetno = 3
+  
+      Worksheets(sheetno).Cells.Font.Color = RGB(0, 0, 0)
+      Worksheets(sheetno).Cells.Interior.Color = RGB(255, 255, 255)
+      Worksheets(sheetno).Cells.Font.Bold = False
+   
+  
+  'Category name Checking
+        
+         For inner_row = 10 To 200
+         Lang = Worksheets("Movies").Range("c" & inner_row).Value
+         If Lang = "English" Then
+         flag = 0
+         innercattitle = Worksheets("Movies").Range("A" & inner_row).Value
+         For Row = 6 To 9
+         catno = Worksheets("Sky Hollywood_Categories").Range("A" & Row).Value
+         cattitle = Worksheets("Sky Hollywood_Categories").Range("B" & Row).Value
+         If cattitle = innercattitle Then
+         flag = 1
+         End If
+         Next Row
+         If flag = 0 And innercattitle <> "" Or Null Then
+         Worksheets("Movies").Range("a" & inner_row).Interior.Color = RGB(124, 45, 36)
+         Call appendtofile(vbCrLf & "Colored cell indicates category name Mismatch ---> " & innercattitle & "; Sheetno 3 " & " Cell a" & inner_row, Logfile_Path & "category_log.txt")
+         End If
+         End If
+         Next inner_row
+  
+        
+        
+  StartRow = 1
+      Do While True
+        Lang = Sheets(sheetno).Range("c" & StartRow).Value
+        Lang = LTrim(RTrim(Lang))
+        If Lang = "Languages" Then
+          StartRow = StartRow + 1
+          Exit Do
+        Else
+          StartRow = StartRow + 1
+        End If
+      Loop
+      
+      EndRow = StartRow
+      
+      Do While True
+        Lang = Sheets(sheetno).Range("c" & EndRow).Value
+        If Lang = "" Then
+          EndRow = EndRow - 1
+          Exit Do
+        End If
+        EndRow = EndRow + 1
+      Loop
+      
+        ProgressBar.Show
+        
+        firstcat = 0
+        seccat = 0
+        thircat = 0
+        foucat = 0
+        
+        
+      
+        
+      For rowno = StartRow To EndRow
+        catname = Sheets(sheetno).Range("A" & rowno).Value
+        Movieid = Sheets(sheetno).Range("B" & rowno).Value
+        next_Movieid = Sheets(sheetno).Range("B" & rowno + 3).Value
+        poster = Sheets(sheetno).Range("m" & rowno).Value
+        catname = LTrim(RTrim(catname))
+        
+        If catname <> "" Then
+          If catname = "Hollywood Blockbusters" Then
+            catno = 1
+            catletter = "va"
+            catname1 = catname
+          ElseIf catname = "Best of Asia" Then
+            catno = 2
+            catletter = "vb"
+            catname1 = catname
+          ElseIf catname = "Timeless Classics" Then
+            catno = 3
+            catletter = "vc"
+            catname1 = catname
+          ElseIf catname = "Around the world" Then
+            catno = 4
+            catletter = "vd"
+            catname1 = catname
+          End If
+          menuitmno = 0
+        End If
+      
+        If catname = "" Then
+        catname = catname1
+        End If
+        
+      
+      
+      
+     '   Count = Count + 1
+        menuitmno = menuitmno + 1
+        Call leadingzero(menuitmno)
+        
+         'Detects Linebreak at the begining of the data
+        
+        For Column = 4 To 12
+        
+        Datainfo = Sheets(sheetno).Cells(rowno, Column)
+        DatainfoC = Sheets(sheetno).Cells(rowno + 1, Column)
+        DatainfoJ = Sheets(sheetno).Cells(rowno + 2, Column)
+        
+        
+        If Left(Datainfo, 1) = Chr(10) Then
+        
+        Sheets(sheetno).Cells(rowno, Column).Interior.Color = RGB(102, 102, 204)
+        
+        Call appendtofile(vbCrLf & "Line Break in the begining of the data --> " & catname & ";  Sheetno " & sheetno & "--> Row No. -----> " & rowno & " Column No.-----> " & Column, Logfile_Path & "Linebreak_log.txt")
+
+        End If
+        
+        If Left(DatainfoC, 1) = Chr(10) Then
+        
+        Sheets(sheetno).Cells(rowno + 1, Column).Interior.Color = RGB(102, 102, 204)
+        
+        Call appendtofile(vbCrLf & "Line Break in the begining of the data --> " & catname & ";  Sheetno " & sheetno & "--> Row No. -----> " & rowno + 1 & " Column No.-----> " & Column, Logfile_Path & "Linebreak_log.txt")
+                
+        End If
+        
+        If Left(DatainfoJ, 1) = Chr(10) Then
+        
+        Sheets(sheetno).Cells(rowno + 2, Column).Interior.Color = RGB(102, 102, 204)
+        
+        Call appendtofile(vbCrLf & "Line Break in the begining of the data --> " & catname & ";  Sheetno " & sheetno & "--> Row No. -----> " & rowno + 2 & " Column No.-----> " & Column, Logfile_Path & "Linebreak_log.txt")
+            
+                
+        End If
+               
+        Next Column
+       
+       'Movies Sequence Numbering Check
+     
+     
+       If Movieid = next_Movieid - 1 Then
+       Else
+       Sheets(sheetno).Range("b" & rowno).Interior.Color = RGB(153, 153, 255)
+       Sheets(sheetno).Range("b" & rowno).Font.Bold = True
+       Call appendtofile(vbCrLf & "Movies Sequnece Numbering Incorrect in the cell / IGNORE IF ITS A LAST CELL --> " & catname & "; Sheetno " & sheetno & "--> " & " Cell b" & rowno, Logfile_Path & "Sequence_log.txt")
+       End If
+        
+         'Movies Poster Issues
+     
+     If filesys.Fileexists(Poster_SPath & poster) Then
+      Else
+      Sheets(sheetno).Range("m" & rowno).Interior.Color = RGB(255, 0, 0)
+      Sheets(sheetno).Range("m" & rowno).Font.Bold = True
+      Call appendtofile(vbCrLf & "Movies -Poster Missing / Poster Not Found --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell m" & rowno, Logfile_Path & "poster_log.txt")
+      End If
+      
+      If poster = "" Then
+      Sheets(sheetno).Range("m" & rowno).Interior.Color = RGB(255, 0, 0)
+      Call appendtofile(vbCrLf & "Movies -Poster Refrence Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell m" & rowno, Logfile_Path & "poster_log.txt")
+    End If
+      
+      If I_poster = Sheets(sheetno).Range("m" & rowno + 1) Then
+      Else
+      Sheets(sheetno).Range("m" & rowno + 1).Interior.Color = RGB(0, 255, 0)
+      Sheets(sheetno).Range("m" & rowno + 1).Font.Bold = True
+      Call appendtofile(vbCrLf & "Movies -Poster Refrence in Incorrect cell--> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell m" & rowno + 1, Logfile_Path & "poster_log.txt")
+      End If
+     
+     If I_poster = Sheets(sheetno).Range("m" & rowno + 2) Then
+      Else
+      Sheets(sheetno).Range("m" & rowno + 2).Interior.Color = RGB(0, 255, 0)
+      Sheets(sheetno).Range("m" & rowno + 2).Font.Bold = True
+      Call appendtofile(vbCrLf & "Movies -Poster Refrence in Incorrect cell--> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell m" & rowno + 2, Logfile_Path & "poster_log.txt")
+      End If
+        
+        'Notfitting / Missing Data issues files....
+        
+        title_eng = Sheets(sheetno).Range("d" & rowno).Value
+        title_chi = Sheets(sheetno).Range("d" & rowno + 1).Value
+        title_jap = Sheets(sheetno).Range("d" & rowno + 2).Value
+        
+        Desc_eng = Sheets(sheetno).Range("e" & rowno).Value
+        desc_chi = Sheets(sheetno).Range("e" & rowno + 1).Value
+        Desc_jap = Sheets(sheetno).Range("e" & rowno + 2).Value
+        
+        cast_eng = Sheets(sheetno).Range("f" & rowno).Value
+        cast_chi = Sheets(sheetno).Range("f" & rowno + 1).Value
+        cast_jap = Sheets(sheetno).Range("f" & rowno + 2).Value
+        
+        rating_eng = Sheets(sheetno).Range("g" & rowno).Value
+        rating_chi = Sheets(sheetno).Range("g" & rowno + 1).Value
+        rating_jap = Sheets(sheetno).Range("g" & rowno + 2).Value
+        
+        duration_eng = Sheets(sheetno).Range("h" & rowno).Value
+        duration_chi = Sheets(sheetno).Range("h" & rowno + 1).Value
+        duration_jap = Sheets(sheetno).Range("h" & rowno + 2).Value
+        
+        lang_eng = Sheets(sheetno).Range("c" & rowno).Value
+        lang_chi = Sheets(sheetno).Range("c" & rowno + 1).Value
+        lang_jap = Sheets(sheetno).Range("c" & rowno + 2).Value
+        
+        SL_eng = Sheets(sheetno).Range("i" & rowno).Value
+        SL_chi = Sheets(sheetno).Range("i" & rowno + 1).Value
+        SL_jap = Sheets(sheetno).Range("i" & rowno + 2).Value
+        
+        SL_eng2 = Sheets(sheetno).Range("j" & rowno).Value
+        SL_chi2 = Sheets(sheetno).Range("j" & rowno + 1).Value
+        SL_jap2 = Sheets(sheetno).Range("j" & rowno + 2).Value
+
+        SL_eng3 = Sheets(sheetno).Range("k" & rowno).Value
+        SL_chi3 = Sheets(sheetno).Range("k" & rowno + 1).Value
+        SL_jap3 = Sheets(sheetno).Range("k" & rowno + 2).Value
+        
+        SL_eng4 = Sheets(sheetno).Range("l" & rowno).Value
+        SL_chi4 = Sheets(sheetno).Range("l" & rowno + 1).Value
+        SL_jap4 = Sheets(sheetno).Range("l" & rowno + 2).Value
+                
+      'To check rendering of words English,Chinese & Japanese in the Language column
+        
+      If lang_eng <> "English" Then
+      Sheets(sheetno).Range("c" & rowno).Interior.Color = RGB(204, 153, 51)
+      Call appendtofile(vbCrLf & "English word not rendered ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell c" & rowno, Logfile_Path & "Language_log.txt")
+      End If
+      
+      If lang_chi <> "Chinese" Then
+      Sheets(sheetno).Range("c" & rowno + 1).Interior.Color = RGB(204, 153, 51)
+      Call appendtofile(vbCrLf & "Chinese word not rendered ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell c" & rowno + 1, Logfile_Path & "Language_log.txt")
+      End If
+      
+      If lang_jap <> "Japanese" Then
+      Sheets(sheetno).Range("c" & rowno + 2).Interior.Color = RGB(204, 153, 51)
+      Call appendtofile(vbCrLf & "Japanese word not rendered ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell c" & rowno + 2, Logfile_Path & "Language_log.txt")
+                  
+      End If
+      
+      'Data Missing Issues
+            
+      If title_eng = "" Then
+      Sheets(sheetno).Range("d" & rowno).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -Title Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno, Logfile_Path & "data_log.txt")
+      End If
+                       
+      If title_chi = "" Then
+      Sheets(sheetno).Range("d" & rowno + 1).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -Title Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 1, Logfile_Path & "data_log.txt")
+      End If
+                  
+      If title_jap = "" Then
+      Sheets(sheetno).Range("d" & rowno + 2).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -Title Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 2, Logfile_Path & "data_log.txt")
+      End If
+        
+      If Desc_eng = "" Then
+      Sheets(sheetno).Range("e" & rowno).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -Synopsis Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno, Logfile_Path & "data_log.txt")
+      End If
+                       
+      If desc_chi = "" Then
+      Sheets(sheetno).Range("e" & rowno + 1).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -Synopsis Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 1, Logfile_Path & "data_log.txt")
+      End If
+                  
+      If desc_chi = "" Then
+      Sheets(sheetno).Range("e" & rowno + 2).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -Synopsis Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 2, Logfile_Path & "data_log.txt")
+      End If
+        
+        
+      If rating_eng = "" Then
+      Sheets(sheetno).Range("g" & rowno).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -rating Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell g" & rowno, Logfile_Path & "data_log.txt")
+      End If
+                       
+      If rating_chi = "" Then
+      Sheets(sheetno).Range("g" & rowno + 1).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -rating Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell g" & rowno + 1, Logfile_Path & "data_log.txt")
+      End If
+                  
+      If rating_jap = "" Then
+      Sheets(sheetno).Range("g" & rowno + 2).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -rating Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell g" & rowno + 2, Logfile_Path & "data_log.txt")
+      End If
+      
+      If duration_eng = "" Then
+      Sheets(sheetno).Range("h" & rowno).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -duration Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell h" & rowno, Logfile_Path & "data_log.txt")
+      End If
+                       
+      If duration_chi = "" Then
+      Sheets(sheetno).Range("h" & rowno + 1).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -duration Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell h" & rowno + 1, Logfile_Path & "data_log.txt")
+      End If
+                  
+      If duration_jap = "" Then
+      Sheets(sheetno).Range("h" & rowno + 2).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -duration Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell h" & rowno + 2, Logfile_Path & "data_log.txt")
+      End If
+       
+      If cast_eng = "" Then
+      Sheets(sheetno).Range("f" & rowno).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -cast Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell f" & rowno, Logfile_Path & "data_log.txt")
+      End If
+                       
+      If cast_chi = "" Then
+      Sheets(sheetno).Range("f" & rowno + 1).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -cast Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell f" & rowno + 1, Logfile_Path & "data_log.txt")
+      End If
+                  
+      If cast_jap = "" Then
+      Sheets(sheetno).Range("f" & rowno + 2).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -cast Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell f" & rowno + 2, Logfile_Path & "data_log.txt")
+      End If
+        
+        
+      If SL_eng = "" Then
+      Sheets(sheetno).Range("i" & rowno).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -First Soundtarck Language Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell i" & rowno, Logfile_Path & "data_log.txt")
+      End If
+                       
+      If SL_chi = "" Then
+      Sheets(sheetno).Range("i" & rowno + 1).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -First Soundtarck Language Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell i" & rowno + 1, Logfile_Path & "data_log.txt")
+      End If
+                  
+      If SL_jap = "" Then
+      Sheets(sheetno).Range("i" & rowno + 2).Interior.Color = RGB(255, 0, 255)
+      Call appendtofile(vbCrLf & "Movies -First Soundtarck Language Blank ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell i" & rowno + 2, Logfile_Path & "data_log.txt")
+      End If
+        
+      'Extra space before the data
+
+      If Left(title_eng, 1) = " " Then
+      Sheets(sheetno).Range("d" & rowno).Interior.Color = RGB(255, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -Title having extra space in the begining ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno, Logfile_Path & "data_log.txt")
+      End If
+                       
+      If Left(title_chi, 1) = " " Then
+      Sheets(sheetno).Range("d" & rowno + 1).Interior.Color = RGB(255, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -Title having extra space in the begining ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 1, Logfile_Path & "data_log.txt")
+      End If
+
+    
+      If Left(title_jap, 1) = " " Then
+      Sheets(sheetno).Range("d" & rowno + 2).Interior.Color = RGB(255, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -Title having extra space in the begining ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 2, Logfile_Path & "data_log.txt")
+      End If
+        
+      
+      If Left(Desc_eng, 1) = " " Then
+      Sheets(sheetno).Range("e" & rowno).Interior.Color = RGB(255, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -Synopsis having extra space in the begining ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno, Logfile_Path & "data_log.txt")
+      End If
+                       
+   
+      If Left(desc_chi, 1) = " " Then
+      Sheets(sheetno).Range("e" & rowno + 1).Interior.Color = RGB(255, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -Synopsis having extra space in the begining ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 1, Logfile_Path & "data_log.txt")
+      End If
+                  
+      
+      If Left(Desc_jap, 1) = " " Then
+      Sheets(sheetno).Range("e" & rowno + 2).Interior.Color = RGB(255, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -Synopsis having extra space in the begining ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 2, Logfile_Path & "data_log.txt")
+      End If
+        
+        
+  
+      If Left(rating_eng, 1) = " " Then
+      Sheets(sheetno).Range("g" & rowno).Interior.Color = RGB(255, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -rating having extra space in the begining ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell g" & rowno, Logfile_Path & "data_log.txt")
+      End If
+                       
+   
+      If Left(rating_chi, 1) = " " Then
+      Sheets(sheetno).Range("g" & rowno + 1).Interior.Color = RGB(255, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -rating having extra space in the begining ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell g" & rowno + 1, Logfile_Path & "data_log.txt")
+      End If
+                  
+     
+      If Left(rating_jap, 1) = " " Then
+      Sheets(sheetno).Range("g" & rowno + 2).Interior.Color = RGB(255, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -rating having extra space in the begining ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell g" & rowno + 2, Logfile_Path & "data_log.txt")
+      End If
+      
+   
+      If Left(duration_eng, 1) = " " Then
+      Sheets(sheetno).Range("h" & rowno).Interior.Color = RGB(255, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -duration having extra space in the begining ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell h" & rowno, Logfile_Path & "data_log.txt")
+      End If
+                       
+      
+      If Left(duration_chi, 1) = " " Then
+      Sheets(sheetno).Range("h" & rowno + 1).Interior.Color = RGB(255, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -duration having extra space in the begining ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell h" & rowno + 1, Logfile_Path & "data_log.txt")
+      End If
+                  
+     
+      If Left(duration_jap, 1) = " " Then
+      Sheets(sheetno).Range("h" & rowno + 2).Interior.Color = RGB(255, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -duration having extra space in the begining ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell h" & rowno + 2, Logfile_Path & "data_log.txt")
+      End If
+       
+      
+      If Left(cast_eng, 1) = " " Then
+      Sheets(sheetno).Range("f" & rowno).Interior.Color = RGB(255, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -cast having extra space in the begining ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell f" & rowno, Logfile_Path & "data_log.txt")
+      End If
+                       
+  
+      If Left(cast_chi, 1) = " " Then
+      Sheets(sheetno).Range("f" & rowno + 1).Interior.Color = RGB(255, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -cast having extra space in the begining ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell f" & rowno + 1, Logfile_Path & "data_log.txt")
+      End If
+                  
+    
+      If Left(cast_jap, 1) = " " Then
+      Sheets(sheetno).Range("f" & rowno + 2).Interior.Color = RGB(255, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -cast having extra space in the begining ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell f" & rowno + 2, Logfile_Path & "data_log.txt")
+      End If
+       
+        
+      'To find comma at the end of Cast info:
+      
+      If Right(cast_eng, 1) = "," Then
+      Sheets(sheetno).Range("f" & rowno).Interior.Color = RGB(204, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -cast having Comma at end ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell f" & rowno, Logfile_Path & "data_log.txt")
+      End If
+                       
+  
+      If Right(cast_chi, 1) = "," Then
+      Sheets(sheetno).Range("f" & rowno + 1).Interior.Color = RGB(204, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -cast having Comma at end ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell f" & rowno + 1, Logfile_Path & "data_log.txt")
+      End If
+                  
+    
+      If Right(cast_jap, 1) = "," Then
+      Sheets(sheetno).Range("f" & rowno + 2).Interior.Color = RGB(204, 255, 102)
+      Call appendtofile(vbCrLf & "Movies -cast having Comma at end ---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell f" & rowno + 2, Logfile_Path & "data_log.txt")
+      End If
+          
+    ' Category Name repeatation check
+   
+    Mov_catname = Sheets(sheetno).Range("a" & rowno).Value
+    If Mov_catname = "Hollywood Blockbusters" Then
+    firstcat = firstcat + 1
+    If firstcat >= 2 Then
+    Call appendtofile(vbCrLf & "Category Name repeated ---> " & Mov_catname & "; Sheetno " & sheetno & " Cell a" & rowno, Logfile_Path & "category_log.txt")
+    Sheets(sheetno).Range("a" & rowno).Interior.Color = RGB(255, 192, 203)
+    End If
+    End If
+    
+    If Mov_catname = "Best of Asia" Then
+    seccat = seccat + 1
+    If seccat >= 2 Then
+    Call appendtofile(vbCrLf & "Category Name repeated ---> " & Mov_catname & "; Sheetno " & sheetno & " Cell a" & rowno, Logfile_Path & "category_log.txt")
+    Sheets(sheetno).Range("a" & rowno).Interior.Color = RGB(255, 192, 203)
+    End If
+    End If
+    
+    If Mov_catname = "Timeless Classics" Then
+    thircat = thircat + 1
+    If thircat >= 2 Then
+    Call appendtofile(vbCrLf & "Category Name repeated ---> " & Mov_catname & "; Sheetno " & sheetno & " Cell a" & rowno, Logfile_Path & "category_log.txt")
+    Sheets(sheetno).Range("a" & rowno).Interior.Color = RGB(255, 192, 203)
+    End If
+    End If
+    
+    If Mov_catname = "Around the World" Then
+    foucat = foucat + 1
+    If foucat >= 2 Then
+    Call appendtofile(vbCrLf & "Category Name repeated ---> " & Mov_catname & "; Sheetno " & sheetno & " Cell a" & rowno, Logfile_Path & "category_log.txt")
+    Sheets(sheetno).Range("a" & rowno).Interior.Color = RGB(255, 192, 203)
+    End If
+    End If
+          
+    'Movies Auto Ellipses in Title
+   
+      title_pos = InStr(1, title_eng, "…") ' To find a string in another string
+      If title_pos <> 0 Then
+      Sheets(sheetno).Range("d" & rowno).Interior.Color = RGB(153, 255, 255)
+      With Sheets(sheetno).Range("d" & rowno).Characters(title_pos, 1).Font
+      .Color = RGB(255, 0, 0)
+      .Bold = True
+      End With
+      Call appendtofile(vbCrLf & "Movies -Title having Auto Ellipses---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno, Logfile_Path & "autoellipses_log.txt")
+    End If
+                           
+        title_pos = InStr(1, title_chi, "…") ' To find a string in another string
+      If title_pos <> 0 Then
+      Sheets(sheetno).Range("d" & rowno + 1).Interior.Color = RGB(153, 255, 255)
+      With Sheets(sheetno).Range("d" & rowno + 1).Characters(title_pos, 1).Font
+      .Color = RGB(255, 0, 0)
+      .Bold = True
+      End With
+      Call appendtofile(vbCrLf & "Movies -Title having Auto Ellipses---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 1, Logfile_Path & "autoellipses_log.txt")
+    End If
+                          
+      title_pos = InStr(1, title_jap, "…") ' To find a string in another string
+      If title_pos <> 0 Then
+      Sheets(sheetno).Range("d" & rowno + 2).Interior.Color = RGB(153, 255, 255)
+      With Sheets(sheetno).Range("d" & rowno + 2).Characters(title_pos, 1).Font
+      .Color = RGB(255, 0, 0)
+      .Bold = True
+      End With
+      Call appendtofile(vbCrLf & "Movies -Title having Auto Ellipses---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 2, Logfile_Path & "autoellipses_log.txt")
+    End If
+    
+    'Movies Auto Eillepses Synopsis
+           
+    Desc_pos = InStr(1, Desc_eng, "…") ' To find a string in another string
+      If Desc_pos <> 0 Then
+      Sheets(sheetno).Range("e" & rowno).Interior.Color = RGB(153, 255, 255)
+      With Sheets(sheetno).Range("e" & rowno).Characters(Desc_pos, 1).Font
+      .Color = RGB(255, 0, 0)
+      .Bold = True
+      End With
+      Call appendtofile(vbCrLf & "Movies -Synopsis having Auto Ellipses---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell e" & rowno, Logfile_Path & "autoellipses_log.txt")
+    End If
+                           
+        Desc_pos = InStr(1, desc_chi, "…") ' To find a string in another string
+      If Desc_pos <> 0 Then
+      Sheets(sheetno).Range("e" & rowno + 1).Interior.Color = RGB(153, 255, 255)
+      With Sheets(sheetno).Range("e" & rowno + 1).Characters(Desc_pos, 1).Font
+      .Color = RGB(255, 0, 0)
+      .Bold = True
+      End With
+      Call appendtofile(vbCrLf & "Movies -Synopsis having Auto Ellipses---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell e" & rowno + 1, Logfile_Path & "autoellipses_log.txt")
+    End If
+                          
+      Desc_pos = InStr(1, Desc_jap, "…") ' To find a string in another string
+      If Desc_pos <> 0 Then
+      Sheets(sheetno).Range("e" & rowno + 2).Interior.Color = RGB(153, 255, 255)
+      With Sheets(sheetno).Range("e" & rowno + 2).Characters(Desc_pos, 1).Font
+      .Color = RGB(255, 0, 0)
+      .Bold = True
+      End With
+      Call appendtofile(vbCrLf & "Movies -Synopsis having Auto Ellipses---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell e" & rowno + 2, Logfile_Path & "autoellipses_log.txt")
+    End If
+    
+      'Movies Auto Eillepses Cast
+        
+     title_pos = InStr(5, cast_eng, "…") ' To find a string in another string
+      If title_pos <> 0 Then
+      Sheets(sheetno).Range("f" & rowno).Interior.Color = RGB(153, 255, 255)
+      With Sheets(sheetno).Range("f" & rowno).Characters(title_pos, 1).Font
+      .Color = RGB(255, 0, 0)
+      .Bold = True
+      End With
+      Call appendtofile(vbCrLf & "Movies -Cast having Auto Ellipses---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno, Logfile_Path & "autoellipses_log.txt")
+    End If
+                           
+        title_pos = InStr(1, cast_chi, "…") ' To find a string in another string
+      If title_pos <> 0 Then
+      Sheets(sheetno).Range("f" & rowno + 1).Interior.Color = RGB(153, 255, 255)
+      With Sheets(sheetno).Range("f" & rowno + 1).Characters(title_pos, 1).Font
+      .Color = RGB(255, 0, 0)
+      .Bold = True
+      End With
+      Call appendtofile(vbCrLf & "Movies -Title having Auto Ellipses---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 1, Logfile_Path & "autoellipses_log.txt")
+    End If
+                          
+      title_pos = InStr(1, cast_jap, "…") ' To find a string in another string
+      If title_pos <> 0 Then
+      Sheets(sheetno).Range("f" & rowno + 2).Interior.Color = RGB(153, 255, 255)
+      With Sheets(sheetno).Range("f" & rowno + 2).Characters(title_pos, 1).Font
+      .Color = RGB(255, 0, 0)
+      .Bold = True
+      End With
+      Call appendtofile(vbCrLf & "Movies -Title having Auto Ellipses---> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 2, Logfile_Path & "autoellipses_log.txt")
+    End If
+    
+        
+        'Not Fitting issues in the Title
+              
+        If Len(title_eng) >= Movies_Eng_title Then
+        
+       
+   
+      With Sheets(sheetno).Range("d" & rowno).Characters(Movies_Eng_title, Len(title_eng)).Font
+      .Color = RGB(255, 0, 0)
+      .Bold = True
+      End With
+      Call appendtofile(vbCrLf & "Movies -Not fitting issue on --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno, Logfile_Path & "notfitting_log.txt")
+      Call writetoUTF8(title_eng, Text_OPath & catletter & menuitmno & "tmo0.txt")
+      End If
+
+      
+      If Len(title_chi) >= Movies_Chi_title Then
+      
+      
+      
+        With Sheets(sheetno).Range("d" & rowno + 1).Characters(Movies_Chi_title, Len(title_chi)).Font
+        .Color = RGB(255, 0, 0)
+        .Bold = True
+        End With
+        Call appendtofile(vbCrLf & "Movies -Not fitting issue on --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 1, Logfile_Path & "notfitting_log.txt")
+        Call writetoUTF8(title_chi, Text_OPath & catletter & menuitmno & "tmo0.chi")
+      End If
+        
+     
+     If Len(title_jap) >= Movies_Jap_title Then
+     
+     
+     
+        With Sheets(sheetno).Range("d" & rowno + 2).Characters(Movies_Jap_title, Len(title_jap)).Font
+        .Color = RGB(255, 0, 0)
+        .Bold = True
+        End With
+        Call appendtofile(vbCrLf & "Movies -Not fitting issue on --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 2, Logfile_Path & "notfitting_log.txt")
+        Call writetoUTF8(title_jap, Text_OPath & catletter & menuitmno & "tmo0.jap")
+      End If
+      
+      'To detect Junk Issues
+      
+        title_pos = InStr(1, title_eng, Junk_tt)
+        If title_pos <> 0 Then
+        Sheets(sheetno).Range("d" & rowno).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno, Logfile_Path & "Junk_log.txt")
+        End If
+      
+        title_pos = InStr(1, title_chi, Junk_tt)
+        If title_pos <> 0 Then
+        Sheets(sheetno).Range("d" & rowno + 1).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 1, Logfile_Path & "Junk_log.txt")
+        End If
+           
+        title_pos = InStr(1, title_jap, Junk_tt)
+        If title_pos <> 0 Then
+        Sheets(sheetno).Range("d" & rowno + 2).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell d" & rowno + 2, Logfile_Path & "Junk_log.txt")
+        End If
+         
+      
+        Desc_pos = InStr(1, Desc_eng, Junk_tt)
+        If Desc_pos <> 0 Then
+        Sheets(sheetno).Range("e" & rowno).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell e" & rowno, Logfile_Path & "Junk_log.txt")
+        End If
+      
+        Desc_pos = InStr(1, desc_chi, Junk_tt)
+        If Desc_pos <> 0 Then
+        Sheets(sheetno).Range("e" & rowno + 1).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell e" & rowno + 1, Logfile_Path & "Junk_log.txt")
+        End If
+           
+        Desc_pos = InStr(1, Desc_jap, Junk_tt)
+        If Desc_pos <> 0 Then
+        Sheets(sheetno).Range("e" & rowno + 2).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell e" & rowno + 2, Logfile_Path & "Junk_log.txt")
+        End If
+      
+        cast_pos = InStr(1, cast_eng, Junk_tt)
+        If cast_pos <> 0 Then
+        Sheets(sheetno).Range("f" & rowno).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell f" & rowno, Logfile_Path & "Junk_log.txt")
+        End If
+      
+        cast_pos = InStr(1, cast_chi, Junk_tt)
+        If cast_pos <> 0 Then
+        Sheets(sheetno).Range("f" & rowno + 1).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell f" & rowno + 1, Logfile_Path & "Junk_log.txt")
+        End If
+           
+        cast_pos = InStr(1, cast_jap, Junk_tt)
+        If cast_pos <> 0 Then
+        Sheets(sheetno).Range("f" & rowno + 2).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell f" & rowno + 2, Logfile_Path & "Junk_log.txt")
+        End If
+        
+        
+        rating_pos = InStr(1, rating_eng, Junk_tt)
+        If rating_pos <> 0 Then
+        Sheets(sheetno).Range("g" & rowno).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell g" & rowno, Logfile_Path & "Junk_log.txt")
+        End If
+      
+        rating_pos = InStr(1, rating_chi, Junk_tt)
+        If rating_pos <> 0 Then
+        Sheets(sheetno).Range("g" & rowno + 1).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell g" & rowno + 1, Logfile_Path & "Junk_log.txt")
+        End If
+           
+        rating_pos = InStr(1, rating_jap, Junk_tt)
+        If rating_pos <> 0 Then
+        Sheets(sheetno).Range("g" & rowno + 2).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell g" & rowno + 2, Logfile_Path & "Junk_log.txt")
+        End If
+        
+        duration_pos = InStr(1, duration_eng, Junk_tt)
+        If duration_pos <> 0 Then
+        Sheets(sheetno).Range("h" & rowno).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell h" & rowno, Logfile_Path & "Junk_log.txt")
+        End If
+      
+        duration_pos = InStr(1, duration_chi, Junk_tt)
+        If duration_pos <> 0 Then
+        Sheets(sheetno).Range("h" & rowno + 1).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell h" & rowno + 1, Logfile_Path & "Junk_log.txt")
+        End If
+           
+        duration_pos = InStr(1, duration_jap, Junk_tt)
+        If duration_pos <> 0 Then
+        Sheets(sheetno).Range("h" & rowno + 2).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell h" & rowno + 2, Logfile_Path & "Junk_log.txt")
+        End If
+        
+        SL_eng_pos = InStr(1, SL_eng, Junk_tt)
+        If SL_eng_pos <> 0 Then
+        Sheets(sheetno).Range("i" & rowno).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell i" & rowno, Logfile_Path & "Junk_log.txt")
+        End If
+      
+        SL_chi_pos = InStr(1, SL_chi, Junk_tt)
+        If SL_chi_pos <> 0 Then
+        Sheets(sheetno).Range("i" & rowno + 1).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell i" & rowno + 1, Logfile_Path & "Junk_log.txt")
+        End If
+           
+        SL_jap_pos = InStr(1, SL_jap, Junk_tt)
+        If SL_jap_pos <> 0 Then
+        Sheets(sheetno).Range("i" & rowno + 2).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell i" & rowno + 2, Logfile_Path & "Junk_log.txt")
+        End If
+        
+        SL_eng2_pos = InStr(1, SL_eng2, Junk_tt)
+        If SL_eng2_pos <> 0 Then
+        Sheets(sheetno).Range("j" & rowno).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell j" & rowno, Logfile_Path & "Junk_log.txt")
+        End If
+      
+        SL_chi2_pos = InStr(1, SL_chi2, Junk_tt)
+        If SL_chi2_pos <> 0 Then
+        Sheets(sheetno).Range("j" & rowno + 1).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell j" & rowno + 1, Logfile_Path & "Junk_log.txt")
+        End If
+           
+        SL_jap2_pos = InStr(1, SL_jap2, Junk_tt)
+        If SL_jap2_pos <> 0 Then
+        Sheets(sheetno).Range("j" & rowno + 2).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell j" & rowno + 2, Logfile_Path & "Junk_log.txt")
+        End If
+        
+        SL_eng3_pos = InStr(1, SL_eng3, Junk_tt)
+        If SL_eng3_pos <> 0 Then
+        Sheets(sheetno).Range("k" & rowno).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell k" & rowno, Logfile_Path & "Junk_log.txt")
+        End If
+      
+        SL_chi3_pos = InStr(1, SL_chi3, Junk_tt)
+        If SL_chi3_pos <> 0 Then
+        Sheets(sheetno).Range("k" & rowno + 1).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell k" & rowno + 1, Logfile_Path & "Junk_log.txt")
+        End If
+           
+        SL_jap3_pos = InStr(1, SL_jap3, Junk_tt)
+        If SL_jap3_pos <> 0 Then
+        Sheets(sheetno).Range("k" & rowno + 2).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell k" & rowno + 2, Logfile_Path & "Junk_log.txt")
+        End If
+        
+        SL_eng4_pos = InStr(1, SL_eng4, Junk_tt)
+        If SL_eng4_pos <> 0 Then
+        Sheets(sheetno).Range("l" & rowno).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell l" & rowno, Logfile_Path & "Junk_log.txt")
+        End If
+      
+        SL_chi4_pos = InStr(1, SL_chi4, Junk_tt)
+        If SL_chi4_pos <> 0 Then
+        Sheets(sheetno).Range("l" & rowno + 1).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell l" & rowno + 1, Logfile_Path & "Junk_log.txt")
+        End If
+           
+        SL_jap4_pos = InStr(1, SL_jap4, Junk_tt)
+        If SL_jap4_pos <> 0 Then
+        Sheets(sheetno).Range("l" & rowno + 2).Interior.Color = vbCyan
+        Call appendtofile(vbCrLf & "Data contains Square shaped junk character --> " & catname & "; Sheetno " & sheetno & "--> Menu Item " & menuitmno & " Cell l" & rowno + 2, Logfile_Path & "Junk_log.txt")
+        End If
+
+       
+       
+        
+        rowno = rowno + 2
+        
+        
+        
+        percentage = (rowno / EndRow) * 100
+
+       'Update the progress bar and the text indicator
+        ProgressBar.ProgressBar1.Value = percentage
+        ProgressBar.lblpercent = Str(percentage) & "%"
+
+'Do any background events so we don't leave the system unresponsive
+DoEvents
+      
+      
+      
+      
+            
+      Next rowno
+      
+            
+      ProgressBar.Hide
+      
+      MsgBox "Verification of Movies Done...", vbOKOnly
+
+ActiveWorkbook.Close savechanges:=True
+End If
+End Sub
+
+
+
