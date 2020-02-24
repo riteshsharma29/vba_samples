@@ -53,3 +53,13 @@ except Exception as err:
 xl.Visible = True
 wb.Close(1)
 xl.Quit()
+
+##################################################################################################
+
+Sub REMOVE_BLANKS_COMM(col)
+Range(col & ":" & col).SpecialCells(xlCellTypeBlanks).EntireRow.Delete
+End Sub
+
+Sub REMOVE_BLANKS()
+Range("A:A").SpecialCells(xlCellTypeBlanks).EntireRow.Delete
+End Sub
